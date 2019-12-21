@@ -35,6 +35,26 @@ public class TicketRZDMainPage extends AllPage {
     @ElementTitle(value = "Имя пользователя")
     public WebDriver userName;
 
+    @FindBy(xpath = "//*[@placeholder=\"Откуда\"]")
+    @ElementTitle(value = "Откуда")
+    public WebDriver byTicketFrom;
+
+    @FindBy(xpath = "//*[@placeholder=\"Куда\"]")
+    @ElementTitle(value = "Куда")
+    public WebDriver buyTicketTo;
+
+    @FindBy(xpath = "//*[@placeholder=\"Туда\"]")
+    @ElementTitle(value = "Туда")
+    public WebDriver buyTicketFromDate;
+
+    @FindBy(xpath = "//*[@placeholder=\"Обратно\"]")
+    @ElementTitle(value = "Обратно")
+    public WebDriver buyTicketBackDate;
+
+    @FindBy(xpath = "//button[span/span[contains(text(), 'Найти')]]")
+    @ElementTitle(value = "Кнопка найти")
+    public WebDriver findBtn;
+
     public void userIsAuthorized(String userName) {
         if(findElement("Имя пользователя").getText().equals(userName)) {
             LOG.info("Пользователь" + userName + " авторизован!");
@@ -50,6 +70,15 @@ public class TicketRZDMainPage extends AllPage {
     public void userOnPage() {
         waitForWindow();
         findElement("Кнопка логина(ключик)");
+    }
+
+    public void autorization(String login, String password) {
+        userOnPage();
+        clickButton("Кнопка логина(ключик)");
+        sendKeys("Поле логин", "kakoito123");
+        sendKeys("Поле пароль", "123456");
+        clickButton("Кнопка войти");
+        userIsAuthorized("Какой-то Какойтович");
     }
 
 }

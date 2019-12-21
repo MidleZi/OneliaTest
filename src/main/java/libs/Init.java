@@ -1,39 +1,29 @@
 package libs;
 
-import com.google.common.reflect.ClassPath;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.After;
-import org.junit.Before;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.Iterator;
-
-import static java.awt.SystemColor.info;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 
 public class Init {
 
-    private Integer timeout;
-    private static final Logger LOG = LoggerFactory.getLogger(Init.class);
     private static WebDriver webDriver;
     private static PageFactory pageFactory;
     private static final String pagesPackage = "ru.pages";
     private static WebDriverWait wait;
+    private static int timeout = 10;
 
 
     //@Before
     public static void startWebDriver(){
         System.setProperty("webdriver.chrome.driver", "C:/Program Files/Java/ChromeDriver/chromedriver.exe");
         webDriver = new ChromeDriver();
-        wait = new WebDriverWait(webDriver, 15);
+        wait = new WebDriverWait(webDriver, timeout);
+        webDriver.manage().window().maximize();
     }
 
     //@After
@@ -42,8 +32,7 @@ public class Init {
     }
 
     public static int getTimeOut() {
-
-        return 111;
+        return timeout;
     }
 
     public static void openStartUpPage(String url) {
@@ -60,6 +49,22 @@ public class Init {
             pageFactory = new PageFactory(getPagePackage());
         }
         return pageFactory;
+    }
+
+    public static String getCurrentDate() {
+        Date dateNow = new Date();
+        SimpleDateFormat formatForDateNow = new SimpleDateFormat("d.MM.yyyy");
+        return formatForDateNow.format(dateNow);
+    }
+
+    public static String getCurrentDate(int days) {
+        Date dateNow = new Date();
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(dateNow);
+        instance.add(Calendar.DAY_OF_MONTH, days);
+        Date newDate = instance.getTime();
+        SimpleDateFormat formatForDateNow = new SimpleDateFormat("dd.MM.yyyy");
+        return formatForDateNow.format(newDate);
     }
 
     public static String getPagePackage() {

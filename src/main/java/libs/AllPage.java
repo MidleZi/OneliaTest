@@ -10,7 +10,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ public abstract class AllPage {
     public static void waitForWindow() {
         waitForWindow(Init.getTimeOut());
     }
+
     public static void waitForWindow(int timeout) {
         WebDriverWait wait = new WebDriverWait(Init.getWebDriver(), timeout);
         wait.until(new ExpectedCondition<Boolean>() {
@@ -42,31 +42,33 @@ public abstract class AllPage {
             }
         });
     }
+
     protected WebElement find(By xpath) throws NullPointerException {
         try {
             waitForWindow();
-        } catch (TimeoutException ex) {
+        } catch (WebDriverException ex) {
             LOG.info(Init.getWebDriver().getPageSource());
             throw new AutotestError("DOM не сформирован! Ошибка при ожидании загрузки страницы");
         }
         try {
+            Init.getWait().until(ExpectedConditions.visibilityOfElementLocated(xpath));
             WebElement element = Init.getWebDriver().findElement(xpath);
-            if(element.isDisplayed()) {
+            if (element.isDisplayed()) {
                 return element;
             }
-        } catch (TimeoutException ex) {
-            throw new NoSuchElementException("Элемент не отобразился. xPath= " + xpath);
+        } catch (TimeoutException | NoSuchElementException ex) {
+                LOG.info(ex.toString());
         }
         throw new ElementNotVisibleException("Элемент не отобразился. xPath= " + xpath);
     }
 
     public void checkVisibleElement(By xpath, int timeout) {
         long deadline = Calendar.getInstance().getTimeInMillis() + (timeout * 1000);
-        while(deadline < Calendar.getInstance().getTimeInMillis()) {
+        while (deadline < Calendar.getInstance().getTimeInMillis()) {
             try {
                 find(xpath);
                 return;
-            }catch (Exception ex) {
+            } catch (Exception ex) {
                 LOG.debug("Элемент " + xpath.toString() + " не виден");
             }
             find(xpath);
@@ -75,37 +77,30 @@ public abstract class AllPage {
     }
 
     public boolean elementVisible(String title) {
-        int timeout = 15;
         By xpath = getXpathFindBy(title);
-        return elementVisible(xpath, timeout);
+        return elementVisible(xpath, Init.getTimeOut());
     }
 
-    public boolean elementVisible(String title, int timeout) {
+    public WebElement findElement(String title) {
         By xpath = getXpathFindBy(title);
-        return elementVisible(xpath, timeout);
+        return findElement(xpath, Init.getTimeOut());
     }
 
-    public WebElement findElement (String title) {
-        int timeout = 15;
-        By xpath = getXpathFindBy(title);
-        return findElement(xpath, timeout);
-    }
-
-    public WebElement findElement (By xpath, int timeout) {
+    public WebElement findElement(By xpath, int timeout) {
         long deadline = Calendar.getInstance().getTimeInMillis() + (timeout * 1000);
-        while(deadline > Calendar.getInstance().getTimeInMillis()) {
+        while (deadline > Calendar.getInstance().getTimeInMillis()) {
             try {
-                Init.getWait().until(ExpectedConditions.visibilityOfElementLocated(xpath));
                 WebElement element = find(xpath);
                 return element;
-            }catch (Exception ex) {
+            } catch (ElementNotVisibleException ex) {
                 LOG.debug("Элемент " + xpath.toString() + " не виден");
             }
-            find(xpath);
-            throw new AutotestError("Элемент " + xpath.toString() + " не виден. жидание составило" + timeout + " сек.");
         }
-        WebElement element = find(xpath);
-        return element;
+        if (elementVisible(xpath, timeout)) {
+            WebElement element = find(xpath);
+            return element;
+        }
+        throw new AutotestError("Элемент " + xpath.toString() + " не виден. жидание составило" + timeout + " сек.");
     }
 
     public void userOnPage() {
@@ -113,10 +108,10 @@ public abstract class AllPage {
     }
 
     public boolean elementVisible(By xpath, int timeout) {
-        try{
+        try {
             checkVisibleElement(xpath, timeout);
             return true;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             LOG.info("Элемент " + xpath.toString() + " не виден");
         }
         return false;
@@ -125,10 +120,10 @@ public abstract class AllPage {
     public By getXpathFindBy(String title) {
         List<Field> fieldList = getDeclaredFieldsWithInheritance(this.getClass());
         String x = "";
-        for(Field field : fieldList) {
-            for(Annotation annotation : field.getAnnotations()) {
-                if(annotation instanceof ElementTitle && ((ElementTitle) annotation).value().equals(title)) {
-                    if(!field.getAnnotation(FindBy.class).xpath().equals(x)){
+        for (Field field : fieldList) {
+            for (Annotation annotation : field.getAnnotations()) {
+                if (annotation instanceof ElementTitle && ((ElementTitle) annotation).value().equals(title)) {
+                    if (!field.getAnnotation(FindBy.class).xpath().equals(x)) {
                         return By.xpath(field.getAnnotation(FindBy.class).xpath());
                     } else if (!field.getAnnotation(FindBy.class).id().equals(x)) {
                         return By.xpath(field.getAnnotation(FindBy.class).id());
@@ -145,9 +140,9 @@ public abstract class AllPage {
                 }
             }
         }
-        for(Field field : fieldList) {
-            for(Annotation annotation : field.getAnnotations()) {
-                if(annotation instanceof ElementTitle) {
+        for (Field field : fieldList) {
+            for (Annotation annotation : field.getAnnotations()) {
+                if (annotation instanceof ElementTitle) {
                     LOG.info("((ElementTitle annotation.value() = " + ((ElementTitle) annotation).value().toString());
                 }
             }
@@ -158,31 +153,35 @@ public abstract class AllPage {
     public static List<Field> getDeclaredFieldsWithInheritance(Class clazz) {
         List<Field> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-        for(Class supp = clazz.getSuperclass(); !supp.getName().equals("java.lang.Object"); supp = supp.getSuperclass()) {
-            fields. addAll(Arrays.asList(supp.getDeclaredFields()));
+        for (Class supp = clazz.getSuperclass(); !supp.getName().equals("java.lang.Object"); supp = supp.getSuperclass()) {
+            fields.addAll(Arrays.asList(supp.getDeclaredFields()));
         }
         return fields;
     }
 
-    public static List<Field> getDeclaredFieldsWithInheritance(Object object) {
-        return getDeclaredFieldsWithInheritance(object.getClass());
-    }
-
     public void clickButton(String title) {
-        if(elementVisible(title)){
-            findElement(title).click();
+        if (elementVisible(title)) {
+            long deadline = Calendar.getInstance().getTimeInMillis() + (Init.getTimeOut() * 1000);
+            while (deadline > Calendar.getInstance().getTimeInMillis()) {
+                try {
+                    findElement(title).click();
+                    break;
+                } catch (WebDriverException ex) {
+                    LOG.info(ex.toString());
+                }
+                LOG.info("Пользователь жмет " + title);
+            }
         }
     }
 
     public void sendKeys(String title, String value) {
-        if(elementVisible(title)){
+        if (elementVisible(title)) {
             findElement(title).sendKeys(value);
+            LOG.info("Пользователь заполняет " + title);
         }
     }
 
     public String getTitle() {
         return ((PageEntry) this.getClass().getAnnotation(PageEntry.class)).title();
     }
-
-
 }
