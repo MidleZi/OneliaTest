@@ -27,7 +27,7 @@ public class TicketRZDMainPage extends AllPage {
     @ElementTitle(value = "Поле пароль")
     public WebDriver passwordField;
 
-    @FindBy(xpath = "//*[@gtmclassname=\"gtm-login\"]")
+    @FindBy(xpath = "//*[contains(text(), 'ВОЙТИ')]/ancestor::button")
     @ElementTitle(value = "Кнопка войти")
     public WebDriver enterBtn;
 
@@ -51,7 +51,7 @@ public class TicketRZDMainPage extends AllPage {
     @ElementTitle(value = "Обратно")
     public WebDriver buyTicketBackDate;
 
-    @FindBy(xpath = "//button[span/span[contains(text(), 'Найти')]]")
+    @FindBy(xpath = "//*[contains(text(), 'Найти')]/ancestor::button")
     @ElementTitle(value = "Кнопка найти")
     public WebDriver findBtn;
 

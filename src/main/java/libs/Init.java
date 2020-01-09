@@ -1,6 +1,8 @@
 package libs;
 
 
+import org.junit.After;
+import org.junit.Before;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -18,16 +20,16 @@ public class Init {
     private static int timeout = 10;
 
 
-    //@Before
-    public static void startWebDriver(){
+    @Before
+    public void startWebDriver(){
         System.setProperty("webdriver.chrome.driver", "C:/Program Files/Java/ChromeDriver/chromedriver.exe");
         webDriver = new ChromeDriver();
         wait = new WebDriverWait(webDriver, timeout);
         webDriver.manage().window().maximize();
     }
 
-    //@After
-    public static void closeWebDriver() {
+    @After
+    public void closeWebDriver() {
         webDriver.quit();
     }
 
@@ -36,7 +38,7 @@ public class Init {
     }
 
     public static void openStartUpPage(String url) {
-        startWebDriver();
+        //startWebDriver();
         webDriver.get(url);
     }
 

@@ -1,6 +1,7 @@
 package ru.pages;
 
 import annotations.ElementTitle;
+import annotations.PageEntry;
 import libs.AllPage;
 import libs.Init;
 import org.openqa.selenium.WebElement;
@@ -11,6 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Calendar;
 import java.util.List;
 
+@PageEntry(title ="Выбор места")
 public class ChoiseTrainSeatsPage extends AllPage {
 
     @FindBy(xpath = "//rzd-select-car//*[contains(@class, 'swiper-slide ng-star-inserted')]")
@@ -21,7 +23,7 @@ public class ChoiseTrainSeatsPage extends AllPage {
     @ElementTitle(value = "Выбор свободного места")
     private WebElement seatChoiseBtn;
 
-    @FindBy(xpath = "//*[@class=\"select-seat__btn-wrap\"]//*[span[contains(text(), 'Продолжить')]]")
+    @FindBy(xpath = "//*[@type=\"terminal\"]//*[contains(text(), 'ПРОДОЛЖИТЬ')]/ancestor::button")
     @ElementTitle(value = "Кнопка продолжить")
     private WebElement nextBtn;
 

@@ -1,12 +1,14 @@
 package ru.pages;
 
 import annotations.ElementTitle;
+import annotations.PageEntry;
 import libs.AllPage;
 import libs.Init;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+@PageEntry(title ="Выбор пассажира")
 public class ChoisePassenegerPage extends AllPage {
 
     @FindBy(xpath = "//*[contains(text(), 'Выбрать пассажира')]/ancestor::rzd-select")
@@ -17,7 +19,7 @@ public class ChoisePassenegerPage extends AllPage {
     @ElementTitle(value = "Пассажир")
     private WebElement passengerBtn;
 
-    @FindBy(xpath = "//button[span[contains(text(), 'К обратной поездке')]]")
+    @FindBy(xpath = "//*[contains(text(), 'К ОБРАТНОЙ ПОЕЗДКЕ')]/ancestor::button")
     @ElementTitle(value = "К обратной поездке")
     private WebElement returnTripBtn;
 

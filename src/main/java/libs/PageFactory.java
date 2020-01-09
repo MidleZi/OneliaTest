@@ -4,16 +4,14 @@ import annotations.PageEntry;
 import com.google.common.reflect.ClassPath;
 import exceptions.AutotestError;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.logging.Logger;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class PageFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(PageFactory.class);
+    private static final Logger LOG = Logger.getLogger(PageFactory.class.getName());
     private final String pagesPackage;
     private String currentPageTitle;
     private AllPage currentPage;
@@ -22,15 +20,11 @@ public class PageFactory {
         this.pagesPackage = pagePackage;
     }
 
-
-
     public AllPage getPage(String title) throws Exception {
         if (null == this.currentPage || !this.currentPageTitle.equals(title)) {
             try {
                 if(null != this.currentPage) {
-                    LOG.info("Я тут на 29 строке фабрики");
                     this.currentPage = this.getPage(this.currentPage.getClass().getPackage().getName(), title);
-                    LOG.info("Прошел 29 строку");
                 }
 
                 if (null == this.currentPage) {
@@ -66,7 +60,7 @@ public class PageFactory {
                 allClasses.add(info.load());
             });
         } catch (Exception ex) {
-            LOG.warn("Failed to shape class info set", ex);
+            LOG.info("Failed to shape class info set" + ex);
         }
 
         Iterator var5 = allClasses.iterator();
@@ -86,8 +80,9 @@ public class PageFactory {
             } else {
                 try {
                     pageTitle = (String) FieldUtils.readStaticField(page, "title", true);
+                    LOG.info("Пользователь на странице " + title);
                 } catch (Exception ex){
-                    LOG.debug("Failed to read {} because it is not page object");
+                    LOG.info("Пытаюсь получить страницу");
                 }
             }
         } while (pageTitle == null || !pageTitle.equals(title));

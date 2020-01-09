@@ -8,8 +8,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ import java.util.List;
 
 public abstract class AllPage {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AllPage.class);
+    private static final Logger LOG = Logger.getLogger(AllPage.class.getName());
 
 
     public static void waitForWindow() {
@@ -69,7 +68,7 @@ public abstract class AllPage {
                 find(xpath);
                 return;
             } catch (Exception ex) {
-                LOG.debug("Элемент " + xpath.toString() + " не виден");
+                LOG.info("Элемент " + xpath.toString() + " не виден");
             }
             find(xpath);
             throw new AutotestError("Элемент " + xpath.toString() + " не виден. Ожидание составило" + timeout + " сек.");
@@ -93,7 +92,7 @@ public abstract class AllPage {
                 WebElement element = find(xpath);
                 return element;
             } catch (ElementNotVisibleException ex) {
-                LOG.debug("Элемент " + xpath.toString() + " не виден");
+                LOG.info("Элемент " + xpath.toString() + " не виден");
             }
         }
         if (elementVisible(xpath, timeout)) {
